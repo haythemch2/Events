@@ -13,7 +13,8 @@ const simple = async (req, res, next) => {
     req.token = token;
     req.user = user;
     next();
-  } catch (e) {
+  } catch (error) {
+    console.log(error);
     res.status(401).send({ error: 'Please authenticate.' });
   }
 };
@@ -31,6 +32,7 @@ const enhance = async (req, res, next) => {
     req.user = user;
     next();
   } catch (e) {
+    console.log(e.message);
     res.status(401).send({ error: 'Please authenticate.' });
   }
 };

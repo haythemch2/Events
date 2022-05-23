@@ -8,13 +8,14 @@ const router = new express.Router();
 // Create a user
 router.post('/users', async (req, res) => {
   try {
-    const {role} = req.body;
+    const { role } = req.body;
     if (role) throw new Error('you cannot set role property.');
     const user = new User(req.body);
     await user.save();
     const token = await user.generateAuthToken();
     res.status(201).send({ user, token });
   } catch (e) {
+    console.log(e);
     res.status(400).send(e);
   }
 });
@@ -106,7 +107,7 @@ router.post('/users/login/google', async (req, res) => {
 // Logout user
 router.post('/users/logout', auth.simple, async (req, res) => {
   try {
-    req.user.tokens = req.user.tokens.filter((token) => {
+    req.user.tokens = req.user.tokens.filter(token => {
       return token.token !== req.token;
     });
     await req.user.save();
@@ -171,12 +172,12 @@ router.patch('/users/me', auth.simple, async (req, res) => {
   console.log(req.body);
   const updates = Object.keys(req.body);
   const allowedUpdates = ['name', 'phone', 'username', 'email', 'password'];
-  const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+  const isValidOperation = updates.every(update => allowedUpdates.includes(update));
   if (!isValidOperation) return res.status(400).send({ error: 'Invalid updates!' });
 
   try {
     const { user } = req;
-    updates.forEach((update) => (user[update] = req.body[update]));
+    updates.forEach(update => (user[update] = req.body[update]));
     await user.save();
     res.send(user);
   } catch (e) {
@@ -194,13 +195,13 @@ router.patch('/users/:id', auth.enhance, async (req, res) => {
 
   const updates = Object.keys(req.body);
   const allowedUpdates = ['name', 'phone', 'username', 'email', 'password', 'role'];
-  const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+  const isValidOperation = updates.every(update => allowedUpdates.includes(update));
 
   if (!isValidOperation) return res.status(400).send({ error: 'Invalid updates!' });
 
   try {
     const user = await User.findById(_id);
-    updates.forEach((update) => (user[update] = req.body[update]));
+    updates.forEach(update => (user[update] = req.body[update]));
     await user.save();
 
     if (!user) return res.sendStatus(404);
